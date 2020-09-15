@@ -1,14 +1,22 @@
 const express = require('express');
 const morgan = require('morgan');
-
+const cors = require('cors');
+const helmet = require('helmet');
+const movieData = require('./movie-data');
 
 const app = express();
 
 app.use(morgan('dev'));
+app.use(cors());
+app.use(helmet());
 
-app.use((req, res, next) => {
-  res.send('Hello, world!');
+
+app.get('/movie', (req, res, next) => {
+  res.json(movieData);
 });
+
+
+
 
 const PORT = 8000;
 
