@@ -1,26 +1,29 @@
-/* eslint-disable indent */
+require('dotenv').config();
 const express = require('express');
 const morgan = require('morgan');
 const cors = require('cors');
 const helmet = require('helmet');
 const movieData = require('./movie-data');
 
+function validateBearerToken (req, res, next){
+  const apiToken = process.env.API_TOKEN;
+  const authVal = req.get('Authorization');
+  
+  if (!authVal.toLowerCase().startsWith('bearer') || authVal.split(' ')[1] !== apiToken){
+    return res.status(401).json({message: 'Unauthorized Request'});  
+  }  
+  next();
+}
+
 const app = express();
 
 app.use(morgan('dev'));
 app.use(cors());
 app.use(helmet());
+app.use(validateBearerToken);
 
 
-app.get('/movie', (req, res, next) => {
-  // let response = MOVIES;
-
-  // if (req.query.genre) {
-  //   response = response.filter(movie =>
-  //     movie.genre.toLowerCase().includes(req.query.genre.toLowerCase())
-  //   )
-  // }
-
+app.get('/movie', (req, res) => {
   const {genre='', country='', avg_vote=''} = req.query;
   let data = movieData;
   //if (genre) filter
